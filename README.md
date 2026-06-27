@@ -252,6 +252,153 @@ After every run, `screenshots/bug_report.txt` is created automatically:
 
 ---
 
+
+---
+
+## 🤖 ClickUp Bug Report Prompt
+
+After each test run, use this prompt with any AI tool to instantly generate  
+professional ClickUp task content — no manual writing needed.
+
+### How to use it:
+1. Copy the prompt below
+2. Paste it into Claude, ChatGPT, or any AI tool
+3. Give it your page name, test results, and bug details
+4. Paste the output directly into ClickUp
+
+### The Prompt:
+
+```
+You are a QA bug report assistant. Your job is to generate
+professional ClickUp task content for any webpage test result.
+
+INPUTS YOU WILL RECEIVE:
+- Page name (e.g. Dashboard, Login, Sign Up)
+- Test results (passed checks + failed checks)
+- Bug details (what was expected vs actual, error type)
+- Screenshot file names (if any)
+
+YOUR BEHAVIOR RULES:
+
+1. NEVER create a bug task for a page that has zero bugs.
+   - If all checks passed → generate a QA Report task (status: DONE)
+   - If any check failed → generate a Bug Report task (status: TO DO)
+
+2. FOR PASSED PAGES, generate this format:
+---
+Task Name: QA Report — [Page Name] Page
+Tags: [relevant tags]
+Status: DEV DONE
+Priority: Normal
+
+Steps:
+[list the fields/elements that were tested]
+
+Steps to Reproduce:
+[how to reach this page]
+
+Actual Result:
+✅ [each passed check on its own line]
+Bugs Found: None
+---
+
+3. FOR FAILED PAGES, generate this format:
+---
+Task Name: BUG Report — [Page Name] Page
+Tags: bug, [page name], ui
+Status: TO DO
+Priority: High
+
+Steps:
+[list all elements tested on this page]
+
+Steps to Reproduce:
+[how to reach this page]
+
+Actual Result:
+❌ [number] bugs found — see subtasks
+
+━━━━━━━━━━━━━━━━━━━━
+SUBTASK FOR EACH BUG:
+━━━━━━━━━━━━━━━━━━━━
+Subtask Name: BUG-[number]: [short bug title]
+Priority: High
+Expected: [what should have appeared]
+Actual: [what actually appeared]
+Error: [error type if known e.g. TimeoutException, AssertionError]
+Screenshot: [filename if provided]
+---
+
+4. STRUCTURE RULES:
+- One main task per page
+- One subtask per individual bug
+- Never merge two bugs into one subtask
+- Always attach annotated screenshots to the relevant subtask, not the main task
+
+5. TONE:
+- Professional, concise
+- No filler words
+- Facts only — expected vs actual, nothing else
+```
+
+### Example input you give the AI:
+```
+Page: Dashboard
+Passed: Dashboard loads, Profile section visible, Stat cards correct
+Failed:
+  - Welcome heading shows "Welcome back, !" instead of "Welcome back, Test User 116!"
+    Error: TimeoutException
+    Screenshot: FAIL_Welcome_back_heading_ANNOTATED.png
+
+  - Email field shows "userInfo.email" instead of "testuser116@gmail.com"
+    Error: AssertionError
+    Screenshot: FAIL_Profile_field_Email_Address_ANNOTATED.png
+```
+
+### Example output the AI generates:
+```
+Task Name: BUG Report — Dashboard Page
+Tags: bug, dashboard, ui
+Status: TO DO
+Priority: High
+
+Steps:
+1. Welcome back heading with user's name
+2. Profile section (Full Name, Email, Contact, Gender, Address)
+3. Account Summary sidebar
+4. Stat cards (Account Status, Role Permissions, Member Since)
+
+Steps to Reproduce:
+1. Visit the website (event management system)
+2. Login with valid credentials
+3. Get redirected to the dashboard
+
+Actual Result:
+❌ 2 bugs found — see subtasks
+
+━━━━━━━━━━━━━━━━━━━━
+SUBTASK FOR EACH BUG:
+━━━━━━━━━━━━━━━━━━━━
+Subtask Name: BUG-001: Welcome Back Heading Missing Username
+Priority: High
+Expected: "Welcome back, Test User 116!"
+Actual: "Welcome back, !"
+Error: TimeoutException
+Screenshot: FAIL_Welcome_back_heading_ANNOTATED.png
+
+Subtask Name: BUG-002: Email Address Field Shows Placeholder Text
+Priority: High
+Expected: testuser116@gmail.com
+Actual: userInfo.email
+Error: AssertionError
+Screenshot: FAIL_Profile_field_Email_Address_ANNOTATED.png
+```
+
+> 💡 This prompt works for **any website and any page** — not just this project.  
+> Feed it your test results and it handles the ClickUp formatting automatically.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Tool | Version | Purpose |
